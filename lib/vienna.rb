@@ -4,12 +4,16 @@ require 'rack'
 module Vienna
   class NotFound
     def initialize(path)
-      @content = ::File.read(path)
-      @length = @content.length.to_s
+      @path = path
+      @content = 'Not Found'
     end
     
     def call(env)
-      [404, {'Content-Type' => 'text/html', 'Content-Length' => @length}, [@content]]
+      if ::File.exist?(@path)
+        @content = ::File.read(@path)
+      end
+      length = @content.length.to_s
+      [404, {'Content-Type' => 'text/html', 'Content-Length' => length}, [@content]]
     end
   end
   
@@ -21,12 +25,8 @@ module Vienna
           :root => 'public',
           :index => 'index.html',
           :header_rules => [[:all, {'Cache-Control' => 'public, max-age=3600'}]]
-        path = 'public/404.html'
-        if File.exist? path
-          run NotFound.new path
-        else
-          run lambda { |env| [404, {'Content-Type' => 'text/html'}, ['Not Found']]}
-        end
+        
+        run NotFound.new('public/404.html')
       end
     end
     
