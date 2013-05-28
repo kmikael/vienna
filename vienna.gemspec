@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Vienna::VERSION
   spec.authors       = ['Mikael Konutgan']
   spec.email         = ['me@kmikael.com']
-  spec.description   = %q{Zero-configuration static file server based on rack}
-  spec.summary       = %q{Zero-configuration static file server based on rack}
-  spec.homepage      = ''
+  spec.description   = %q{Tiny, zero-configuration static file server built on top of rack}
+  spec.summary       = %q{Tiny, zero-configuration static file server built on top of rack}
+  spec.homepage      = 'https://github.com/kmikael/vienna'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
