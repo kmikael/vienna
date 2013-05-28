@@ -3,7 +3,7 @@ require 'rack'
 
 module Vienna
   class NotFound
-    def initialize(path)
+    def initialize(path = '')
       @path = path
       @content = 'Not Found'
     end
@@ -18,15 +18,15 @@ module Vienna
   end
   
   class Application
-    def initialize
+    def initialize(root)
       @app = Rack::Builder.new do
         use Rack::Static,
-          :urls => Dir.glob('public/*').map { |fn| fn.gsub(/public/, '')},
-          :root => 'public',
+          :urls => Dir.glob("#{root}/*").map { |fn| fn.gsub(/#{root}/, '')},
+          :root => root,
           :index => 'index.html',
           :header_rules => [[:all, {'Cache-Control' => 'public, max-age=3600'}]]
         
-        run NotFound.new('public/404.html')
+        run NotFound.new("#{root}/404.html")
       end
     end
     
@@ -35,7 +35,9 @@ module Vienna
     end
   end
   
-  def self.call(env)
-    Application.new.call(env)
+  class << self
+    def call(env)
+      Application.new('public').call(env)
+    end
   end
 end
