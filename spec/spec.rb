@@ -29,9 +29,9 @@ describe Vienna do
     end
   end
   
-  it 'should return "Not Found" for all files that don\'t exist' do
+  it 'should serve `404-html` for pages that aren\'t found' do
     res = @request.get '/path'
-    res.body.must_equal 'Not Found'
+    res.body.chomp.must_equal '404'
     res.status.must_equal 404
   end
 end
