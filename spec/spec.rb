@@ -20,7 +20,7 @@ describe Vienna do
   it 'should serve all files in the public directory' do
     @request.get('/css/style.css').body.chomp.must_equal 'style'
     @request.get('/images/image.svg').body.chomp.must_equal 'image'
-     @request.get('/about.html').body.chomp.must_equal 'about'
+    @request.get('/about.html').body.chomp.must_equal 'about'
   end
   
   it 'should cache all files' do

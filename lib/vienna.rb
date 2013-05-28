@@ -1,7 +1,37 @@
 require 'vienna/version'
 require 'rack'
 
+##
+# Zero-configuration convenience wrapper around `Vienna::Application`.
+# Add this to `config.ru`:
+#
+#     require 'vienna'
+#     run Vienna
+#
+# Your static site in `public` will be served.
+#
+
 module Vienna
+
+  class << self
+    def call(env)
+      Application.new.call(env)
+    end
+  end
+  
+  ##
+  # `Vienna::NotFound` is a default endpoint not unlike `Rack::NotFound`.
+  # Initialize it with the path to a 404 page and it will get returned.
+  # The difference is that if a 404 page doesn't exist, a default
+  # response, 'Not Found' will be returned.
+  #
+  # Examples
+  #
+  #     run Vienna::NotFound.new('public/404.html')
+  #
+  #     run Vienna::NotFound.new # Always return 'Not Found'
+  #
+  
   class NotFound
     def initialize(path = '')
       @path = path
@@ -17,8 +47,20 @@ module Vienna
     end
   end
   
+  ##
+  # `Vienna::Application` serves all files under the given `root`
+  # using `Rack::Static`. If a file/path doen't exist,
+  # `Vienna::NotFound` is run, which always returns `404`.
+  # 
+  # Examples
+  #
+  #     run Vienna::Application.new('_site')
+  #
+  #     run Vienna::Application.new # The root defaults to 'public'
+  #
+  
   class Application
-    def initialize(root)
+    def initialize(root = 'public')
       @app = Rack::Builder.new do
         use Rack::Static,
           :urls => Dir.glob("#{root}/*").map { |fn| fn.gsub(/#{root}/, '')},
@@ -32,12 +74,6 @@ module Vienna
     
     def call(env)
       @app.call(env)
-    end
-  end
-  
-  class << self
-    def call(env)
-      Application.new('public').call(env)
     end
   end
 end
