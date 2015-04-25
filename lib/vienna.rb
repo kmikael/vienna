@@ -35,15 +35,13 @@ module Vienna
   class NotFound
     def initialize(path = '')
       @path = path
-      @content = 'Not Found'
     end
     
     def call(env)
-      if ::File.exist?(@path)
-        @content = ::File.read(@path)
-      end
-      length = @content.length.to_s
-      [404, {'Content-Type' => 'text/html', 'Content-Length' => length}, [@content]]
+      content = File.exist?(@path) ? File.read(@path) : 'Not Found'
+      length = content.length.to_s
+      
+      [404, {'Content-Type' => 'text/html', 'Content-Length' => length}, [content]]
     end
   end
   
