@@ -8,6 +8,7 @@ describe Vienna do
       use Rack::Lint
       run Vienna
     end
+    
     @request = Rack::MockRequest.new(app)
   end
   
@@ -29,7 +30,7 @@ describe Vienna do
     end
   end
   
-  it 'should serve `404-html` for pages that aren\'t found' do
+  it 'should serve `404.html` for pages that aren\'t found' do
     res = @request.get '/path'
     res.body.chomp.must_equal '404'
     res.status.must_equal 404
