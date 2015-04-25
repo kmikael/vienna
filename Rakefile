@@ -3,7 +3,7 @@ require 'yard'
 
 task :default => :test
 
-desc 'Test'
+desc 'Run tests'
 task :test do
   Dir.chdir 'spec'
   system 'ruby -I ../lib spec.rb'
