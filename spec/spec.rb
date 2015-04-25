@@ -12,27 +12,53 @@ describe Vienna do
     @request = Rack::MockRequest.new(app)
   end
   
-  it 'should serve the index when getting root' do
-    res = @request.get '/'
-    res.body.chomp.must_equal 'index'
-    [200, 304].must_include res.status
-  end
-  
-  it 'should serve all files in the public directory' do
-    @request.get('/css/style.css').body.chomp.must_equal 'style'
-    @request.get('/images/image.svg').body.chomp.must_equal 'image'
-    @request.get('/about.html').body.chomp.must_equal 'about'
-  end
-  
-  it 'should cache all files' do
-    ['/', '/css/style.css', '/images/image.svg', 'about.html'].each do |path|
-      @request.get(path).headers['Cache-Control'].must_equal 'public, max-age=3600'
+  describe 'when requesting the root directory' do
+    before do
+      @res = @request.get('/')
+    end
+    
+    it 'should serve the index path' do
+      @res.body.chomp.must_equal 'index'
+    end
+    
+    it 'should return a valid status code, that is 200: OK or 304: Not Modified' do
+      [200, 304].must_include @res.status
     end
   end
   
-  it 'should serve `404.html` for pages that aren\'t found' do
-    res = @request.get '/path'
-    res.body.chomp.must_equal '404'
-    res.status.must_equal 404
+  describe 'when requesting the path of a subdirectory of the root directory' do
+    before do
+      @paths = {
+        '/css/style.css'    => 'style',
+        '/images/image.svg' => 'image',
+        '/about.html'       => 'about'
+      }
+    end
+    
+    it 'should serve the contents of the paths' do
+      @paths.each do |path, body|
+        @request.get(path).body.chomp.must_equal body
+      end
+    end
+    
+    it 'should cache all responses for a an hour' do
+      @paths.each do |path, body|
+        @request.get(path).headers['Cache-Control'].must_equal 'public, max-age=3600'
+      end
+    end
+  end
+  
+  describe 'when requesting a path that does not exist' do
+    before do
+      @res = @request.get('/path')
+    end
+    
+    it 'should serve the contents of `404.html` if the file exists' do
+      @res.body.chomp.must_equal '404'
+    end
+    
+    it 'should return the status code 404: Not Found' do
+      @res.status.must_equal 404
+    end
   end
 end
