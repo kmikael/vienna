@@ -3,7 +3,7 @@ require 'rack'
 
 ##
 # Zero-configuration convenience wrapper around `Vienna::Application`.
-# Add this to `config.ru`:
+# Add this to your `config.ru`:
 #
 #     require 'vienna'
 #     run Vienna
@@ -20,10 +20,53 @@ module Vienna
   end
   
   ##
+  # `Vienna::Static` is just a wrapper for `Rack::Static` with
+  # sane and opinionated options.
+  #
+  # It serves all files under the given `root` and doesn't passes on requests
+  # for files that don't exist.
+  #
+  # Examples
+  #
+  #     use Vienna::Static, 'public'
+  #
+  
+  class Static
+    def initialize(app, root)
+      @app = app
+      @root = root
+    end
+    
+    def urls
+      Dir.glob("#{root}/*").map { |f| f.sub(root, '') }
+    end
+    
+    def root
+      @root
+    end
+    
+    def index
+      'index.html'
+    end
+    
+    def header_rules
+      [[:all, {'Cache-Control' => 'public, max-age=3600'}]]
+    end
+    
+    def options
+      {urls: urls, root: root, index: index, header_rules: header_rules}
+    end
+    
+    def call(env)
+      Rack::Static.new(@app, options).call(env)
+    end
+  end
+  
+  ##
   # `Vienna::NotFound` is a default endpoint not unlike `Rack::NotFound`.
-  # Initialize it with the path to a 404 page and it will get returned.
-  # The difference is that if a 404 page doesn't exist, a default
-  # response, 'Not Found' will be returned.
+  # Initialize it with the path to a 404 page and its contents will be served.
+  # The difference is that if a 404 page doesn't exist, a default response,
+  # 'Not Found' will be served.
   #
   # Examples
   #
@@ -46,10 +89,11 @@ module Vienna
   end
   
   ##
-  # `Vienna::Application` serves all files under the given `root`
-  # using `Rack::Static`. If a file/path doen't exist,
-  # `Vienna::NotFound` is run, which always returns `404`.
-  # 
+  # `Vienna::Application` serves all files under the given root directory
+  # using `Vienna::Static`. If a file/path doen't exist, `Vienna::NotFound`
+  # is run, which always returns a status of `404` and the contents of
+  # `404.html` or `'Not Found'` if one does not exist.
+  #
   # Examples
   #
   #     run Vienna::Application.new('_site')
@@ -60,12 +104,7 @@ module Vienna
   class Application
     def initialize(root = 'public')
       @app = Rack::Builder.new do
-        use Rack::Static,
-          :urls => [""],
-          :root => root,
-          :index => 'index.html',
-          :header_rules => [[:all, {'Cache-Control' => 'public, max-age=3600'}]]
-        
+        use Static, root
         run NotFound.new("#{root}/404.html")
       end
     end
