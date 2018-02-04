@@ -80,11 +80,32 @@ module Vienna
       @path = path
     end
     
+
+    def content
+      File.exist?(@path) ? File.read(@path) : 'Not Found'
+    end
+
+    def content_length
+      content.length.to_s
+    end
+
+    def status
+      404
+    end
+
+    def headers
+      {
+        'Content-Type' => 'text/html',
+        'Content-Length' => content_length
+      }
+    end
+
+    def body
+      [content]
+    end
+
     def call(env)
-      content = File.exist?(@path) ? File.read(@path) : 'Not Found'
-      length = content.length.to_s
-      
-      [404, {'Content-Type' => 'text/html', 'Content-Length' => length}, [content]]
+      [status, headers, body]
     end
   end
   
