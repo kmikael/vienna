@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = Vienna::VERSION
   spec.authors       = ['Mikael Konutgan']
   spec.email         = ['me@kmikael.com']
-  spec.description   = 'Tiny, zero-configuration static file server built on top of rack'
+  spec.description   = 'Tiny, zero-configuration static file server'
   spec.summary       = 'Tiny, zero-configuration static file server built on top of rack'
   spec.homepage      = 'https://github.com/kmikael/vienna'
   spec.license       = 'MIT'
@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 1.0'
   spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'minitest', '~> 5.0'
-  spec.add_development_dependency 'yard', '~> 0.8'
+  spec.add_development_dependency 'yard', '~> 0.9'
 end
