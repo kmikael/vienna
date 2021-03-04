@@ -38,7 +38,7 @@ module Vienna
     end
     
     def urls
-      Dir.glob("#{root}/*").map { |f| f.sub(root, '') }
+      Dir.glob("#{root}/*").map { |f| f.sub(root, '') }.prepend("/")
     end
     
     def root
@@ -54,7 +54,7 @@ module Vienna
     end
     
     def options
-      {urls: urls, root: root, index: index, header_rules: header_rules}
+      {urls: urls, root: root, index: index, header_rules: header_rules, cascade: true}
     end
     
     def call(env)
